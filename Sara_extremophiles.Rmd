@@ -1,0 +1,197 @@
+---
+title: "Sara_extremophiles"
+author: "Absar"
+date: "07/09/2024"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# Load necessary library
+library(stringr)
+
+# Define the directory containing your files
+input_directory <- "E:/SARA_AFZAL/ARGs_FASTA"
+
+# Get list of all files with extensions like .fsa, .fna, etc.
+file_list <- list.files(path = input_directory, pattern = "\\.(fsa_nt)$", full.names = TRUE)
+
+# Function to rename and copy files with .fasta extension
+convert_to_fasta <- function(file) {
+  # Create new file name with .fasta extension
+  new_file <- str_replace(file, "\\.(fsa_nt)$", ".fasta")
+  
+  # Copy the content to the new file with the .fasta extension
+  file.copy(file, new_file)
+}
+
+# Apply the conversion to all files
+lapply(file_list, convert_to_fasta)
+
+cat("Conversion completed!")
+
+```
+
+```{r}
+#convert file type to csv 
+# Load necessary library
+library(stringr)
+
+# Define the directory containing your files
+input_directory <- "E:/SARA_AFZAL/SARA_Resfinder/Resfinder"
+
+# Get list of all files with txt extension
+
+file_list <- list.files(path = input_directory, pattern = "\\.(txt)$", full.names = TRUE)
+
+# Function to rename and copy files with .csv extension
+convert_to_csv <- function(file) {
+  # Create new file name with .csv extension
+  new_file <- str_replace(file, "\\.(txt)$", ".csv")
+  
+  # Copy the content to the new file with the .csv extension
+  file.copy(file, new_file)
+}
+
+# Apply the conversion to all files
+lapply(file_list, convert_to_csv)
+
+cat("Conversion completed!")
+
+
+```
+
+```{r}
+#extract filenames from a folder
+folder_fasta_path <- "E:/SARA_AFZAL/Drafts/Extremophiles_FASTA"
+files_fasta <- list.files(folder_fasta_path)
+# Extract only the required part (before the first dot)
+files_fasta <- gsub("\\..*", "", files_fasta)  # Removes everything after the first dot
+write.csv(data.frame(Filenames=files_fasta),"E:/SARA_AFZAL/Extremophile_fasta_filenames.csv", row.names = FALSE)
+
+#extract filenames from another folder
+folder_RGI <- "E:/SARA_AFZAL/Drafts/ARGs_Found"
+files_RGI <- list.files(folder_RGI)
+# Extract only the required part (before the first dot)
+files_RGI <- gsub("\\..*", "", files_RGI)  # Removes everything after the first dot
+write.csv(data.frame(Filenames_rgi = files_RGI), "E:/SARA_AFZAL/RGI_filenames.csv", row.names = FALSE)
+```
+
+```{r}
+#Find if both list have common values in a column
+# Read the CSV files
+file1 <- read.csv("E:/SARA_AFZAL/Extremophile_fasta_filenames.csv", stringsAsFactors = FALSE)
+file2 <- read.csv("E:/SARA_AFZAL/RGI_filenames.csv", stringsAsFactors = FALSE)
+
+# Extract the first column (assuming it contains filenames)
+filenames1 <- file1[[1]]  # First column of file1
+filenames2 <- file2[[1]]  # First column of file2
+
+# Find common filenames
+common_filenames <- intersect(filenames1, filenames2)
+View(data.frame(common_filenames))
+
+#For uncommon filenames
+# Find uncommon filenames
+uncommon_filenames1 <- setdiff(filenames1, filenames2)
+uncommon_filenames2 <- setdiff(filenames2, filenames1)
+View(data.frame(uncommon_filenames1))
+View(data.frame(uncommon_filenames2))
+
+
+#extract filenames from a folder
+folder_fasta_path <- "E:/SARA_AFZAL/SARA_FASTA_ALL"
+files_fasta_accession <- list.files(folder_fasta_path)
+# Extract only the required part (before the first dot)
+files_fasta_accession <- gsub("\\.fsa_nt", "", files_fasta)
+files_fasta_accession <- gsub("\\.fasta", "", files_fasta)
+files_fasta_accession <- gsub("\\.FASTA", "", files_fasta)
+write.csv(data.frame(files_fasta_accession = files_fasta_accession), "E:/SARA_AFZAL/SARA_FASTA_ALL_accession.csv", row.names = FALSE)
+files_fasta_accession <- read.csv("E:/SARA_AFZAL/SARA_FASTA_ALL_accession.csv")
+files_fromtable <- read.csv("E:/SARA_AFZAL/ALL_Fastafromfinaltable.csv")
+filenames1 <- files_fasta_accession[[1]]  # First column of file1
+filenames2 <- files_fromtable[[1]]
+
+common <- intersect(filenames1, filenames2)
+View(data.frame(common))
+write.csv(common, "E:/SARA_AFZAL/CommonFinal_FASTA_accession.csv", row.names = FALSE)
+uncommon1 <- setdiff(filenames1, filenames2)
+uncommon2 <- setdiff (filenames2, filenames1)
+write.csv(uncommon1, "E:/SARA_AFZAL/unCommon1_Final_FASTA_accession.csv", row.names = FALSE)
+write.csv(uncommon2, "E:/SARA_AFZAL/unCommon2_Final_FASTA_accession.csv", row.names = FALSE)
+
+```
+
+```{r}
+library(readr)
+library(dplyr)
+#EXTRACT THE FILENAMES AND CREATE A COLUMN OF THOSE NAMES
+AMRfiles_extremophiles <- list.files("E:/SARA_AFZAL/FINAL_FILES/FASTA_files_withAMR/SARA_AMRcontainingFiles")
+
+write.csv(AMRfiles_extremophiles, "E:/SARA_AFZAL/FINAL_FILES/AMRfiles_extremophiles.csv", row.names = FALSE)
+
+AMR_files <- read.csv("E:/SARA_AFZAL/FINAL_FILES/AMRfiles_extremophiles.csv")
+
+colnames(AMR_files) <- c("Accession_number")
+
+AMR_files <- AMR_files %>% mutate(Accession_number = sub("^((GCA|GCF)_\\d+\\.\\d+).*", "\\1", Accession_number))
+
+
+write.csv(AMR_files, "E:/SARA_AFZAL/FINAL_FILES/AMRfiles_extremophiles.csv", row.names = FALSE)
+
+
+#Clean mlst files
+data1 <- read.delim("E:/SARA_AFZAL/FINAL_FILES/rough/SARA_AMR_mlst.tsv", sep = "\t", header = FALSE)
+
+colnames(data1) <- c("Accession_number", "Species", "ST", "HK1", "HK2", "HK3", "HK4", "HK5", "HK6", "HK7")
+
+data1$Accession_number <- sub(".*/", "", data1$Accession_number)             # Remove path
+data1$Accession_number <- sub("\\.fasta$|\\.fna$", "", data1$Accession_number)  # Remove .fasta or .fna
+write.csv(data1, file = "E:/SARA_AFZAL/FINAL_FILES/rough/mlst1.csv", row.names = FALSE)
+
+data2 <- read.delim("E:/SARA_AFZAL/FINAL_FILES/rough/SARA_AMR_mlst2.tsv", sep = "\t", header = FALSE)
+colnames(data2) <- c("Accession_number", "Species", "ST", "HK1", "HK2", "HK3", "HK4", "HK5", "HK6", "HK7")
+# Use sub() or gsub() with regular expression
+data2$Accession_number <- sub(".*/(GCA_[0-9]+\\.[0-9]+)_.*", "\\1", data2$Accession_number)
+write.csv(data2, file = "E:/SARA_AFZAL/FINAL_FILES/rough/mlst2.csv", row.names = FALSE)
+
+#merge both files
+
+mlst1 <- read.csv("E:/SARA_AFZAL/FINAL_FILES/rough/mlst1.csv")
+mlst2 <- read.csv("E:/SARA_AFZAL/FINAL_FILES/rough/mlst2.csv")
+#merged mlst1.csv file and mlst2.csv file
+merged_mlst <- bind_rows(mlst1, mlst2)
+write.csv(merged_mlst, "E:/SARA_AFZAL/FINAL_FILES/merged_mlst.csv", row.names = FALSE)
+
+
+
+
+
+
+##########################ROUGH WORK
+#change column names in a csv file
+df1 <- read.csv("E:/SARA_AFZAL/FINAL_FILES/filtered_unmatched_accessions_v2.csv")
+df2 <- read.csv("E:/SARA_AFZAL/FINAL_FILES/FINAL_amrfiltered_matched_accessions_v2.csv")
+
+# df1 Clean the Accession_number column
+df1 <- df1 %>%
+  mutate(Accession_number = sub("_genomic.*", "", Accession_number))
+df1 <- df1 %>%
+  mutate(Accession_number = sub("_ASM.*", "", Accession_number))
+write.csv(df1, "E:/SARA_AFZAL/FINAL_FILES/filtered_unmatched_accessions_v2_1.csv")
+
+# df2 Clean the Accession_number column
+df2 <- df2 %>%
+  mutate(Accession_number = sub("_genomic.*", "", Accession_number))
+df1 <- df1 %>%
+  mutate(Accession_number = sub("_ASM.*", "", Accession_number))
+write.csv(df1, "E:/SARA_AFZAL/FINAL_FILES/filtered_unmatched_accessions_v2_1.csv")
+#####################################
+
+
+
+```
+

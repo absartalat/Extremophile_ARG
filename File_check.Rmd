@@ -1,0 +1,1123 @@
+---
+title: "Files_check"
+author: "Absar"
+date: "22/04/2025"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+#SARA_FASTA_ALL folder has multiple file formats. Change every file to fasta type.
+library(readxl)
+library(dplyr)
+
+# Set folder paths
+folder_path <- "E:/SARA_AFZAL/SARA_FASTA_ALL"
+output_path <- file.path(folder_path, "converted_fasta")
+skipped_path <- file.path(folder_path, "skipped_files")
+
+# Create output folders
+dir.create(output_path, showWarnings = FALSE)
+dir.create(skipped_path, showWarnings = FALSE)
+
+# Track counters
+converted_count <- 0
+skipped_count <- 0
+unknown_type <- 0
+
+# Log file for skipped files
+skipped_log <- file.path(folder_path, "skipped_files_log.txt")
+file.create(skipped_log)
+
+# List all files
+files <- list.files(folder_path, full.names = TRUE)
+
+for (file in files) {
+  ext <- tools::file_ext(file)
+  base <- tools::file_path_sans_ext(basename(file))
+  df <- NULL  # Reset df
+
+  # FASTA and fsa_nt: just copy/rename
+  if (ext %in% c("fasta", "fa")) {
+    file.copy(file, file.path(output_path, paste0(base, ".fasta")), overwrite = TRUE)
+    converted_count <- converted_count + 1
+
+  } else if (ext == "fsa_nt") {
+    file.copy(file, file.path(output_path, paste0(base, ".fasta")), overwrite = TRUE)
+    converted_count <- converted_count + 1
+
+  # Excel or CSV: try to read and convert
+  } else if (ext %in% c("xlsx", "xls")) {
+    df <- tryCatch(read_excel(file), error = function(e) NULL)
+
+  } else if (ext == "csv") {
+    df <- tryCatch(read.csv(file, stringsAsFactors = FALSE), error = function(e) NULL)
+
+  } else {
+    # Unknown file type → log and skip
+    message(paste("Skipping unknown type:", file))
+    write(paste("Unknown type skipped:", basename(file)), file = skipped_log, append = TRUE)
+    file.copy(file, file.path(skipped_path, basename(file)), overwrite = TRUE)
+    unknown_type <- unknown_type + 1
+    next
+  }
+
+  # Convert dataframes to FASTA
+  if (!is.null(df)) {
+    if (all(c("ID", "Sequence") %in% colnames(df))) {
+      fasta_lines <- paste0(">", df$ID, "\n", df$Sequence)
+      writeLines(fasta_lines, file.path(output_path, paste0(base, ".fasta")))
+      converted_count <- converted_count + 1
+    } else {
+      message(paste("Skipping:", basename(file), "- missing ID or Sequence"))
+      write(paste("Missing columns:", basename(file)), file = skipped_log, append = TRUE)
+      file.copy(file, file.path(skipped_path, basename(file)), overwrite = TRUE)
+      skipped_count <- skipped_count + 1
+    }
+  }
+}
+
+# Final status message
+cat("\n✅ Converted files:", converted_count,
+    "\n⚠️ Skipped files (missing columns or unknown type):", skipped_count + unknown_type,
+    "\n📁 Check '", skipped_path, "' and log:", skipped_log, "\n")
+
+
+```
+
+```{r}
+# Define the folder path and retrieve filenames
+skipped_folder <- "E:/SARA_AFZAL/SARA_FASTA_ALL/skipped_files"
+
+# Get file names only (without full path)
+file_names <- list.files(skipped_folder)
+
+# Save as CSV
+write.csv(data.frame(Skipped_Files = file_names),
+          file = "E:/SARA_AFZAL/skipped_files_list.csv",
+          row.names = FALSE)
+
+```
+
+
+
+```{r}
+# Rename files by removing .fsa_nt from filename.
+#Path to your folder
+folder_path <- "E:/SARA_AFZAL/SARA_FASTA_ALL"
+
+# List all files in the folder
+files <- list.files(folder_path, full.names = TRUE)
+
+# Loop through and rename files by removing '.fsa_nt'
+for (file in files) {
+  new_name <- gsub("\\.fsa_nt$", "", file)  # Remove '.fsa_nt' at the end
+  if (file != new_name) {
+    file.rename(file, new_name)
+  }
+}
+
+```
+
+
+```{r}
+# Load necessary library
+library(dplyr)
+
+# Path to your CSV file
+csv_path <- "Accession_no_full.csv"
+
+# Path to the folder with files
+folder_path <- "E:/SARA_AFZAL/SARA_FASTA_ALL_v2"
+
+# Read the CSV
+acc_df <- read.csv(csv_path, stringsAsFactors = FALSE)
+
+# Get list of files in the folder (without extension)
+file_names <- list.files(folder_path)
+
+# Check if Accession_number is in the list of files
+acc_df$File_Present <- acc_df$Accession_number %in% tools::file_path_sans_ext(basename(file_names))
+
+# Alternatively, for partial match (if file names start with accession numbers)
+#acc_df$File_Present <- sapply(acc_df$Accession_number, function(x) any(grepl(paste0("^", x), file_names)))
+
+# View the result
+print(acc_df)
+
+# Optionally, save to a new CSV
+write.csv(acc_df, "accession_check_output_v2.csv", row.names = FALSE)
+
+
+```
+
+```{r}
+#Check the TRUE values of accession number in final table
+library(dplyr)
+
+# --- Step 1: Load previous file with File_Present TRUE/FALSE ---
+checked_df <- read.csv("accession_check_output_v2.csv", stringsAsFactors = FALSE)
+
+# Filter only TRUE matches
+matched_accessions <- checked_df %>%
+  filter(File_Present == TRUE) %>%
+  pull(Accession_number)
+#unmatched
+unmatched_accessions <- checked_df %>%
+  filter(File_Present == FALSE) %>%
+  pull(Accession_number)
+
+# --- Step 2: Load the new CSV with Accession_no column ---
+csv2 <- read.csv("FINAL_TABLES.csv", stringsAsFactors = FALSE)
+
+# --- Step 3: Filter for matched and unmatched entries ---
+matched_table <- csv2 %>%
+  filter(Accession_number %in% matched_accessions)
+
+unmatched_table <- csv2 %>%
+  filter(Accession_number %in% unmatched_accessions)
+
+# --- Step 4: Save both as CSVs ---
+write.csv(matched_table, "filtered_matched_accessions_v2.csv", row.names = FALSE)
+write.csv(unmatched_table, "filtered_unmatched_accessions_v2.csv", row.names = FALSE)
+```
+
+```{r}
+# For creating a new folder with names matching to accession numbers from final table. Load required package
+if (!require("fs")) install.packages("fs", dependencies = TRUE)
+library(fs)
+
+# Set paths
+accession_file <- "E:/SARA_AFZAL/Sara_Extremophiles/matched_accession_list.csv"
+source_folder <- "E:/SARA_AFZAL/SARA_FASTA_ALL_v2"
+matched_folder <- "E:/SARA_AFZAL/Matched_FASTA"
+unmatched_folder <- "E:/SARA_AFZAL/Unmatched_FASTA"
+
+# Create folders if they don't exist
+if (!dir_exists(matched_folder)) dir_create(matched_folder)
+if (!dir_exists(unmatched_folder)) dir_create(unmatched_folder)
+
+# Read accession numbers
+accessions <- read.csv(accession_file, header = TRUE, stringsAsFactors = FALSE)[, 1]
+
+# Get all files in source folder
+all_files <- dir_ls(source_folder, recurse = FALSE)
+
+# Match files containing any accession number
+matched_flags <- sapply(all_files, function(file) {
+  any(sapply(accessions, function(acc) grepl(acc, basename(file), fixed = TRUE)))
+})
+
+# Separate matched and unmatched files
+matched_files <- all_files[matched_flags]
+unmatched_files <- all_files[!matched_flags]
+
+# Copy files
+file_copy(matched_files, matched_folder, overwrite = TRUE)
+file_copy(unmatched_files, unmatched_folder, overwrite = TRUE)
+
+# Report
+cat(length(matched_files), "files matched and copied to", matched_folder, "\n")
+cat(length(unmatched_files), "files unmatched and copied to", unmatched_folder, "\n")
+
+```
+
+```{r}
+# For creating a new folder with names matching to accession numbers from final table. Load required package
+if (!require("fs")) install.packages("fs", dependencies = TRUE)
+library(fs)
+
+# Set paths
+accession_file <- "E:/SARA_AFZAL/Sara_Extremophiles/matched_accession_list.csv"
+source_folder <- "E:/SARA_AFZAL/SARA_FASTAv2_amrfinder"
+matched_folder <- "E:/SARA_AFZAL/Matched_amrfinder"
+unmatched_folder <- "E:/SARA_AFZAL/Unmatched_amrfinder"
+
+# Create folders if they don't exist
+if (!dir_exists(matched_folder)) dir_create(matched_folder)
+if (!dir_exists(unmatched_folder)) dir_create(unmatched_folder)
+
+# Read accession numbers
+accessions <- read.csv(accession_file, header = TRUE, stringsAsFactors = FALSE)[, 1]
+
+# Get all files in source folder
+all_files <- dir_ls(source_folder, recurse = FALSE)
+
+# Match files containing any accession number
+matched_flags <- sapply(all_files, function(file) {
+  any(sapply(accessions, function(acc) grepl(acc, basename(file), fixed = TRUE)))
+})
+
+# Separate matched and unmatched files
+matched_files <- all_files[matched_flags]
+unmatched_files <- all_files[!matched_flags]
+
+# Copy files
+file_copy(matched_files, matched_folder, overwrite = TRUE)
+file_copy(unmatched_files, unmatched_folder, overwrite = TRUE)
+
+# Report
+cat(length(matched_files), "files matched and copied to", matched_folder, "\n")
+cat(length(unmatched_files), "files unmatched and copied to", unmatched_folder, "\n")
+
+```
+
+```{r}
+#Extract file names and save it as a csv file
+sara_new_amr <- "E:/SARA_AFZAL/SARA_amr_2_FINAL"
+file_names_amr <- list.files(sara_new_amr)
+write.csv(data.frame(SARA_unmatched_amr=file_names_amr), "E:/SARA_AFZAL/SARA_amr_2_FINAL.csv", row.names=FALSE)
+#extract folder names and save it as csv file
+sara_unmatched <- "E:/SARA_AFZAL/ncbi_dataset/data"
+folder_names <- list.dirs(sara_unmatched)
+write.csv(data.frame(sara_unmatched_files=folder_names), "E:/SARA_AFZAL/sara_unmatched_files.csv", row.names = FALSE)
+```
+
+
+```{r}
+#extracting files with names mentioned in csv file
+# Set paths
+csv_path <- "E:/SARA_AFZAL/SARA_AMR_UNMATCHED_FINAL.csv"                # CSV with filenames (e.g., file1.txt)
+source_base <- "E:/SARA_AFZAL/SARA_downloaded_later"          # Source with subfolders named like filenames
+dest_dir <- "E:/SARA_AFZAL/SARA_downloaded_later_AMRfinal"        # Destination for collected files
+
+# Create destination directory if it doesn't exist
+if (!dir.exists(dest_dir)) {
+  dir.create(dest_dir, recursive = TRUE)
+}
+
+# Read the CSV (assuming single column, no header)
+file_list <- read.csv(csv_path, stringsAsFactors = FALSE, header = FALSE)
+csv_filenames <- file_list[[1]]
+
+# Loop through and extract files
+for (csv_file in csv_filenames) {
+  # Remove ".csv" from the name to get the base
+  base <- sub("\\.csv$", "", csv_file)
+  
+  # Subfolder name is the prefix (everything before "_genomic")
+  subfolder <- sub("_ASM.*", "", base)
+  
+  # File to copy: .fna file inside that subfolder
+  source_file <- file.path(source_base, subfolder, paste0(base, ".fna"))
+  
+  # Destination path
+  dest_file <- file.path(dest_dir, paste0(base, ".fna"))
+  
+  # Check and copy
+  if (file.exists(source_file)) {
+    file.copy(source_file, dest_file)
+  } else {
+    warning(paste("File not found:", source_file))
+  }
+}
+
+cat("Done copying matching .fna files to", dest_dir, "\n")
+
+```
+
+
+```{r}
+#set folder containing csv file
+csv_folder_amr1 <- "E:/SARA_AFZAL/Matched_amrfinder"
+output_folder_amr1 <- file.path(csv_folder_amr1, "fixed_csvs")
+
+#create output folder if it doesn't exist
+if(!dir.exists(output_folder_amr1)){
+  dir.create(output_folder_amr1)
+}
+#list all csv files
+# List all .csv files
+csv_files <- list.files(csv_folder_amr1, pattern = "\\.csv$", full.names = TRUE)
+
+# Function to detect delimiter (comma or tab)
+detect_delimiter <- function(file) {
+  first_line <- readLines(file, n = 1)
+  if (grepl("\t", first_line)) return("\t")
+  return(",")
+}
+
+# Process each CSV file
+for (file in csv_files) {
+  delimiter <- detect_delimiter(file)
+  data <- read.table(file, sep = delimiter, header = TRUE, quote = "\"", stringsAsFactors = FALSE, fill = TRUE)
+
+  # Output filename (same name, new folder)
+  output_file <- file.path(output_folder_amr1, basename(file))
+
+  # Write in Windows-friendly CSV format
+  write.csv(data, output_file, row.names = FALSE, fileEncoding = "UTF-8", eol = "\r\n")
+}
+
+cat("All CSV files fixed and saved to:", output_folder_amr1, "\n")
+
+#To sort and screen out files greater than size 342 bytes
+#set folder path
+
+csv_folder <- "E:/SARA_AFZAL/Matched_amrfinder"
+output_folder <- file.path(csv_folder, "filtered_csvs")
+#create output folder if it doesn't exist
+if(!dir.exists(output_folder)){
+  dir.create(output_folder)
+}
+
+#list all csv files
+csv_files <- list.files(csv_folder, pattern ="\\.csv$", full.names = TRUE)
+#GET FILE SIZEs
+file_info <- file.info(csv_files)
+#filter files >342 bytes
+filtered_files <- rownames(file_info[file_info$size > 342, ])
+
+#copy the filtered files
+file.copy(filtered_files, output_folder)
+
+#report 
+cat(length(filtered_files), "csv files copied to", output_folder, "\n")
+
+#Extract filenames
+sara_amr_files <- "E:/SARA_AFZAL/Matched_amrfinder/filtered_csvs"
+sara_amr_1_list <- list.files(sara_amr_files)
+write.csv(sara_amr_1_list, "E:/SARA_AFZAL/sara_amr_1_list.csv")
+
+#************************************************************************#
+
+#create a new_directory with only those fasta files which are in the csv
+csv_path <- "E:/SARA_AFZAL/sara_amr_1_list.csv"
+
+sara_amr_1 <- "E:/SARA_AFZAL/FASTA_DIVIDED_fromv2_350files/Matched_FASTA"
+
+dest_dir <- "E:/SARA_AFZAL/SARA_amr_1final"
+
+#create dir if it doesn't exist
+if(!dir.exists(output_amr_1)){
+  dir.create(output_amr_1)
+}
+#match from csv filenames and filter those files only
+# Read the CSV (assuming single column, no header)
+file_list <- read.csv(csv_path, stringsAsFactors = FALSE, header = FALSE)
+csv_filenames <- file_list[[1]]
+
+copied_files <- c()  # To track how many were successfully copied
+
+for (csv_file in csv_filenames) {
+  # Remove ".csv" and optional version number (e.g., .1)
+  base <- sub("\\.csv$", "", csv_file)  # AP008957.1.csv → AP008957
+
+  # Build source and destination paths
+  source_file <- file.path(sara_amr_1, paste0(base, ".fasta"))
+  output_file <- file.path(dest_dir, paste0(base, ".fasta"))
+
+  # Copy if file exists
+  if (file.exists(source_file)) {
+    file.copy(source_file, output_file)
+    copied_files <- c(copied_files, base)
+  } else {
+    warning(paste("File not found:", source_file))
+  }
+}
+
+cat("Copied", length(copied_files), "FASTA files to", dest_dir, "\n")
+
+```
+```{r}
+#To sort and screen out files greater than size 294 bytes from AMR2files
+#set folder path
+
+csv_folder <- "E:/SARA_AFZAL/Work_AT/SARA_FASTAv2_amrfinder"
+output_folder <- file.path(csv_folder, "filtered_csvs")
+#create output folder if it doesn't exist
+if(!dir.exists(output_folder)){
+  dir.create(output_folder)
+}
+
+#list all csv files
+csv_files <- list.files(csv_folder, pattern ="\\.csv$", full.names = TRUE)
+#GET FILE SIZEs
+file_info <- file.info(csv_files)
+#filter files >294 bytes
+filtered_files <- rownames(file_info[file_info$size > 294, ])
+
+#copy the filtered files
+file.copy(filtered_files, output_folder)
+
+#report 
+cat(length(filtered_files), "csv files copied to", output_folder, "\n")
+
+```
+
+```{r}
+#set folder containing csv file from initial files_downloaded by sara
+csv_folder_amr1 <- "E:/SARA_AFZAL/FINAL_FILES/SARA_amr_results_1"
+output_folder_amr1 <- file.path(csv_folder_amr1, "fixed_csvs")
+
+#create output folder if it doesn't exist
+if(!dir.exists(output_folder_amr1)){
+  dir.create(output_folder_amr1)
+}
+#list all csv files
+# List all .csv files
+csv_files <- list.files(csv_folder_amr1, pattern = "\\.csv$", full.names = TRUE)
+
+# Function to detect delimiter (comma or tab)
+detect_delimiter <- function(file) {
+  first_line <- readLines(file, n = 1)
+  if (grepl("\t", first_line)) return("\t")
+  return(",")
+}
+
+# Process each CSV file
+for (file in csv_files) {
+  delimiter <- detect_delimiter(file)
+  data <- read.table(file, sep = delimiter, header = TRUE, quote = "\"", stringsAsFactors = FALSE, fill = TRUE)
+
+  # Output filename (same name, new folder)
+  output_file <- file.path(output_folder_amr1, basename(file))
+
+  # Write in Windows-friendly CSV format
+  write.csv(data, output_file, row.names = FALSE, fileEncoding = "UTF-8", eol = "\r\n")
+}
+
+cat("All CSV files fixed and saved to:", output_folder_amr1, "\n")
+
+```
+
+
+```{r}
+#processing genomad results_plasmid
+# Load necessary libraries
+library(dplyr)
+library(readr)
+
+# Define the base directory
+base_dir <- "E:/SARA_AFZAL/FINAL_FILES/SARA_genomad"
+
+# Get list of all *_plasmid_summary.tsv files recursively
+tsv_files <- list.files(base_dir, pattern = "_plasmid_summary\\.tsv$", recursive = TRUE, full.names = TRUE)
+
+# Initialize an empty list to store dataframes
+all_data <- list()
+
+# Loop through files and read each as character
+for (file in tsv_files) {
+  # Extract identifier from parent folder
+  id <- basename(dirname(dirname(file)))
+
+  # Read file with all columns as character to avoid type mismatch
+  df <- read_tsv(file, col_types = cols(.default = col_character()))
+
+  # Add ID column
+  df$Genome_ID <- id
+
+  # Store in list
+  all_data[[length(all_data) + 1]] <- df
+}
+
+# Combine all dataframes
+final_df <- bind_rows(all_data)
+
+# Save to CSV
+write_csv(final_df, "E:/SARA_AFZAL/FINAL_FILES/SARA_genomad_combined_plasmid_summary.csv")
+
+cat("✅ Combined file saved successfully.\n")
+
+#count no. of files showing plasmids.
+plasmid_carriers <- final_df %>% count(Genome_ID)
+# View the result
+print(plasmid_carriers)
+
+# To count how many unique Genome_IDs have plasmids
+num_with_plasmids <- nrow(plasmid_carriers)
+print(num_with_plasmids)
+
+```
+```{r}
+#processing genomad results_viruses_integrated
+# Load necessary libraries
+library(dplyr)
+library(readr)
+
+# Define the base directory
+base_dir <- "E:/SARA_AFZAL/FINAL_FILES/SARA_genomad"
+
+# Get list of all *_virus_summary.tsv files recursively
+tsv_files <- list.files(base_dir, pattern = "_virus_summary\\.tsv$", recursive = TRUE, full.names = TRUE)
+
+# Initialize an empty list to store dataframes
+all_data <- list()
+
+# Loop through files and read each as character
+for (file in tsv_files) {
+  # Extract identifier from parent folder
+  id <- basename(dirname(dirname(file)))
+
+  # Read file with all columns as character to avoid type mismatch
+  df <- read_tsv(file, col_types = cols(.default = col_character()))
+
+  # Add ID column
+  df$Genome_ID <- id
+
+  # Store in list
+  all_data[[length(all_data) + 1]] <- df
+}
+
+# Combine all dataframes
+final_df <- bind_rows(all_data)
+
+# Save to CSV
+write_csv(final_df, "E:/SARA_AFZAL/FINAL_FILES/SARA_genomad_combined_virus_summary.csv")
+
+cat("✅ Combined file saved successfully.\n")
+
+#count no. of files showing viruses.
+virus_carriers <- final_df %>% count(Genome_ID)
+# View the result
+print(virus_carriers)
+
+# To count how many unique Genome_IDs have viruses
+num_with_virus <- nrow(virus_carriers)
+print(num_with_virus)
+```
+
+```{r}
+#matching identified amr gene ids on plasmids through genomad with NCBI-amr finder database
+library(dplyr)
+library(readr)
+library(tidyr)
+library(stringr)
+
+# Step 1: Read the combined plasmid summary
+genomad_df <- read_csv("E:/SARA_AFZAL/FINAL_FILES/SARA_genomad_combined_plasmid_summary.csv", show_col_types = FALSE)
+
+# Step 2: Read AMRFinder reference file
+amr_ref <- read_csv("E:/SARA_AFZAL/FINAL_FILES/NCBIfam_AMRFinder.csv", show_col_types = FALSE)
+
+# Step 3: Rename column for easier joining
+amr_ref <- amr_ref %>%
+  rename(ID = `#hmm_accession`)  # Rename "#hmm_accession" to "ID"
+
+# Step 4: Unnest the amr_genes column
+amr_long <- genomad_df %>%
+  select(seq_name, Genome_ID, amr_genes) %>%
+  filter(!is.na(amr_genes)) %>%
+  mutate(amr_genes = str_split(amr_genes, ";")) %>%
+  unnest(amr_genes) %>%
+  rename(ID = amr_genes)  # Rename split values to ID
+
+# Step 5: Join with annotation data
+amr_annotated <- amr_long %>%
+  left_join(amr_ref, by = "ID")
+
+# Step 6: Save the result
+write_csv(amr_annotated, "E:/SARA_AFZAL/FINAL_FILES/Matched_AMR_annotations.csv")
+cat("✅ AMR gene annotations merged and saved to 'Matched_AMR_annotations.csv'.\n")
+
+
+```
+```{r}
+#fixed with accession id stripped from abc.1 to abc
+library(dplyr)
+library(readr)
+library(tidyr)
+library(stringr)
+
+# Step 1: Read the combined plasmid summary
+genomad_df <- read_csv("E:/SARA_AFZAL/FINAL_FILES/SARA_genomad_combined_plasmid_summary.csv", show_col_types = FALSE)
+
+# Step 2: Read the AMRFinder reference file
+amr_ref <- read_csv("E:/SARA_AFZAL/FINAL_FILES/NCBIfam_AMRFinder.csv", show_col_types = FALSE)
+
+# Step 3: Rename and clean up accession ID (remove version numbers like .1)
+amr_ref <- amr_ref %>%
+  rename(ID = `#hmm_accession`) %>%
+  mutate(ID = str_remove(ID, "\\.\\d+$"))  # Remove version numbers like ".1"
+
+# Step 4: Unnest the amr_genes column
+amr_long <- genomad_df %>%
+  select(seq_name, Genome_ID, amr_genes) %>%
+  filter(!is.na(amr_genes)) %>%
+  mutate(amr_genes = str_split(amr_genes, ";")) %>%
+  unnest(amr_genes) %>%
+  rename(ID = amr_genes)  # Rename split values to ID
+
+# Step 5: Join with annotation data
+amr_annotated <- amr_long %>%
+  left_join(amr_ref, by = "ID")
+
+# Step 6: Save the result
+write_csv(amr_annotated, "E:/SARA_AFZAL/FINAL_FILES/Matched_AMR_annotations.csv")
+cat("✅ AMR gene annotations matched and saved successfully.\n")
+
+```
+
+```{r}
+#form a final table of amr containing files and all the data publication etc. 
+library(dplyr)
+library(readr)
+library(tidyr)
+library(stringr)
+df1<- read.csv("E:/SARA_AFZAL/FINAL_FILES/filtered_unmatched_accessions_v2.csv", stringsAsFactors = FALSE)
+
+df2 <- read.csv("E:/SARA_AFZAL/FINAL_FILES/filtered_unmatched_accessions_v2_1.csv", stringsAsFactors = FALSE)
+
+df3<- read.csv("E:/SARA_AFZAL/FINAL_FILES/FINAL_amrfiltered_matched_accessions_v2.csv")
+
+amr_df <- read.csv("E:/SARA_AFZAL/FINAL_FILES/AMRfiles_extremophiles.csv", stringsAsFactors = FALSE)
+# Filter df where Accession_number is in amr_df
+filtered_df1 <- df1[df1$Accession_number %in% amr_df$Accession_number, ]
+# View result
+write.csv(filtered_df1, "E:/SARA_AFZAL/FINAL_FILES/filtered_df1.csv", row.names = FALSE)
+
+filtered_df2 <- df2[df2$Accession_number %in% amr_df$Accession_number, ]
+# View result
+write.csv(filtered_df2, "E:/SARA_AFZAL/FINAL_FILES/filtered_df2.csv", row.names = FALSE)
+
+filtered_df3 <- df3[df3$Accession_number %in% amr_df$Accession_number, ]
+# View result
+write.csv(filtered_df3, "E:/SARA_AFZAL/FINAL_FILES/filtered_df3.csv", row.names = FALSE)
+df1_csv <- read.csv("E:/SARA_AFZAL/FINAL_FILES/filtered_df1.csv")
+df2_csv <- read.csv("E:/SARA_AFZAL/FINAL_FILES/filtered_df2.csv")
+df3_csv <- read.csv("E:/SARA_AFZAL/FINAL_FILES/filtered_df3.csv")
+
+#combine all the three files
+Final_amr_info <- rbind(df1_csv, df2_csv, df3_csv)
+Final_amr_info_final <- unique(Final_amr_info)
+write.csv(Final_amr_info, "E:/SARA_AFZAL/FINAL_FILES/final_amr_info.csv", row.names = FALSE)
+write.csv(Final_amr_info_final, "E:/SARA_AFZAL/FINAL_FILES/final_amr_info_final.csv", row.names = FALSE)
+col1 <- Final_amr_info_final$Accession_number
+col2 <- amr_df$Accession_number
+print(duplicated(col1,col2))
+absent_related_data <- col2[!(col2 %in% col1)]
+
+write.csv(absent_related_data, "E:/SARA_AFZAL/FINAL_FILES/absent_related_data.csv", row.names = FALSE)
+
+df<- read.csv("E:/SARA_AFZAL/FINAL_FILES/final_amr_info_final.csv")
+
+bacterial_count = df %>% count(`Bacterial.name..Found.of.Species.finder.`)
+write.csv(bacterial_count, "E:/SARA_AFZAL/FINAL_FILES/Bacterial_count.csv")
+
+bacterial_count = df %>% count(`Bacterial.name..Found.of.Species.finder.`) %>% arrange(desc(n)) %>% slice_head(n=10)
+write.csv(bacterial_count, "E:/SARA_AFZAL/FINAL_FILES/Bacterial_count_top10.csv")
+print(bacterial_count)
+library
+```
+```{r}
+library(dplyr)
+library(readr)
+mlst_data <- read.csv("E:/SARA_AFZAL/FINAL_FILES/merged_mlst.csv")
+df <- read.csv("E:/SARA_AFZAL/FINAL_FILES/final_amr_info_final.csv")
+info_merged_mlst <- df %>% left_join(mlst_data, by ="Accession_number")
+write.csv(info_merged_mlst, "E:/SARA_AFZAL/FINAL_FILES/info_merged_mlst.csv")
+```
+
+```{r}
+#file conversion
+library(dplyr)
+library(readr)
+amr_files <- list.files("E:/SARA_AFZAL/FINAL_FILES/FASTA_files_withAMR/SARA_AMRcontainingFiles", pattern = "\\.fasta$", full.names = TRUE)
+#rename 
+for (file in amr_files) {
+  new_name <- sub("\\.fasta$", ".fna", file)
+  file.rename(file, new_name)
+}
+
+```
+
+```{r}
+library(dplyr)
+library(readr)
+amr_plasmid <- read.csv("E:/SARA_AFZAL/FINAL_FILES/Matched_AMR_annotations.csv")
+amr_plasmid_names <- unique(amr_plasmid$gene_symbol)
+write.csv(amr_plasmid_names, "E:/SARA_AFZAL/FINAL_FILES/amr_plasmid_names.csv", row.names = FALSE)
+
+amr_count <- amr_plasmid %>% count(amr_plasmid$gene_symbol)
+print(amr_count)
+
+amr_count_sorted <- amr_count %>% arrange(desc(n))
+
+print(amr_count_sorted)
+write.csv(amr_count_sorted, "E:/SARA_AFZAL/FINAL_FILES/amr_count_sorted.csv", row.names = FALSE)
+
+
+```
+
+```{r}
+#merging all amr csv files together
+# Load required libraries
+library(dplyr)
+library(stringr)
+
+# Set folder path
+folder_path <- "E:/SARA_AFZAL/FINAL_FILES/AMR"
+
+# List all CSV files in the folder
+file_list <- list.files(path = folder_path, pattern = "\\.csv$", full.names = TRUE)
+
+# Function to clean and load each file
+read_and_clean <- function(file) {
+  df <- read.csv(file, stringsAsFactors = FALSE)
+  
+  # Remove leading/trailing spaces from all character columns
+  df <- df %>%
+    mutate(across(where(is.character), ~ str_trim(.)))
+  
+  # Add filename column (without path)
+  df$Source_File <- basename(file)
+  
+  return(df)
+}
+
+# Read, clean, and combine all files
+merged_df <- do.call(rbind, lapply(file_list, read_and_clean))
+
+# Optional: write to CSV
+write.csv(merged_df, "E:/SARA_AFZAL/FINAL_FILES/AMR_merged_cleaned.csv", row.names = FALSE)
+#now count amr,mechanisms etc.
+amr_merged_df <- read.csv("E:/SARA_AFZAL/FINAL_FILES/AMR_merged_cleaned.csv")
+amr_finder_total <- amr_merged_df %>% count(Element.symbol) %>% arrange(desc(n))
+write.csv(amr_finder_total, "E:/SARA_AFZAL/FINAL_FILES/AMR_finder_count.csv", row.names = FALSE)
+
+## ELEMENT NAME COUNT
+amr_finder_name <- amr_merged_df %>% count(Element.name) %>% arrange(desc(n))
+write.csv(amr_finder_name, "E:/SARA_AFZAL/FINAL_FILES/AMR_finder_namecount.csv", row.names = FALSE)
+
+##class
+amr_class <- amr_merged_df %>% count(Class) %>% arrange(desc(n))
+write.csv(amr_class, "E:/SARA_AFZAL/FINAL_FILES/AMR_finder_classcount.csv", row.names = FALSE)
+
+##Subclass
+amr_subclass <- amr_merged_df %>% count(Subclass) %>% arrange(desc(n))
+write.csv(amr_subclass, "E:/SARA_AFZAL/FINAL_FILES/AMR_finder_subclasscount.csv", row.names = FALSE)
+
+
+
+```
+
+
+```{r}
+#for creating a final table with all accession numbers, paper names and extremophile category
+library(dplyr)
+library(tidyr)
+
+# Read files
+file1 <- read.csv("E:/SARA_AFZAL/FINAL_FILES/mergedFINAL_FILES_with_category.csv")
+file2 <- read.csv("E:/SARA_AFZAL/FINAL_FILES/rough/filtered_unmatched_accessions_v2.csv")
+file3 <- read.csv("E:/SARA_AFZAL/FINAL_FILES/rough/filtered_unmatched_accessions_v2_1.csv")
+file4 <- read.csv("E:/SARA_AFZAL/FINAL_FILES/rough/FINAL_amrfiltered_matched_accessions_v2.csv")
+
+# Combine accession info from all three sources
+accession_combined <- bind_rows(
+  file2 %>% select(Accession_number_1, Accession_number, Checked_accession_number),
+  file3 %>% select(Accession_number_1, Accession_number, Checked_accession_number),
+  file4 %>% select(Accession_number_1, Accession_number, Checked_accession_number)
+) %>%
+  # Keep only the first non-duplicated match
+  distinct(Accession_number_1, .keep_all = TRUE)
+
+# Merge into file1
+final_table <- file1 %>%
+  left_join(accession_combined, by = "Accession_number_1")
+
+# Write to new file
+write.csv(final_table, "E:/SARA_AFZAL/FINAL_FILES/Final_table_cleaned.csv", row.names = FALSE)
+
+
+```
+
+```{r}
+library(dplyr)
+#for creating amr table with Bioproject no and details of extremophillic category
+# Read both files
+# Load your files
+df1 <- read.csv("E:/SARA_AFZAL/FINAL_FILES/AMR_merged_cleaned.csv")
+df2 <- read.csv("E:/SARA_AFZAL/FINAL_FILES/Final_table_cleaned.csv", header = TRUE)
+
+# Clean accession numbers (remove .csv and anything after underscore)
+df1$Accession_number <- sub("\\.csv$", "", df1$Accession_number)
+
+
+# Select only the columns needed from df2
+df2_subset <- df2[, c("Accession_number", 
+                      "Extremophile_Category", 
+                      "Bacterial.name..Found.of.Species.finder.", 
+                      "Bacterial.name..written.in.paper.")]
+
+# Merge to enrich df1 with those columns
+amr_extremo_categorized <- merge(df1, df2_subset, by = "Accession_number", all.x = TRUE)
+
+#write csv
+write.csv(amr_extremo_categorized, "E:/SARA_AFZAL/FINAL_FILES/amr_extremo_categorized.csv", row.names = FALSE)
+
+#again do it for gca accession number
+df1_rough <- read.csv("E:/SARA_AFZAL/FINAL_FILES/amr_extremo_categorized.csv", header = TRUE)
+
+# Clean accession numbers (remove .csv and anything after underscore)
+df1_rough$Accession_number <- sub("^(([^_]+_[^_]+)).*", "\\1", df1_rough$Accession_number)
+
+# Select only the columns needed from df2
+df2_subset <- df2[, c("Accession_number", 
+                      "Extremophile_Category", 
+                      "Bacterial.name..Found.of.Species.finder.", 
+                      "Bacterial.name..written.in.paper.")]
+
+# Merge to enrich df1 with those columns
+amr_extremo_categorized_2 <- merge(df1_rough, df2_subset, by = "Accession_number", all.x = TRUE)
+
+#write csv
+write.csv(amr_extremo_categorized_2, "E:/SARA_AFZAL/FINAL_FILES/amr_extremo_categorized_2.csv", row.names = FALSE)
+#further 3rd cleaning
+df1_rough2 <- read.csv("E:/SARA_AFZAL/FINAL_FILES/amr_extremo_categorized_2.csv")
+# Clean Accession_number (remove version number like .1, .2, etc.)
+df1_rough2$Accession_number <- sub("\\.\\d+$", "", df1_rough2$Accession_number)
+
+
+# Select only the columns needed from df2
+df2_subset <- df2[, c("Accession_number", 
+                      "Extremophile_Category", 
+                      "Bacterial.name..Found.of.Species.finder.", 
+                      "Bacterial.name..written.in.paper.")]
+
+# Merge to enrich df1 with those columns
+amr_extremo_categorized_3 <- merge(df1_rough2, df2_subset, by = "Accession_number", all.x = TRUE)
+
+#write csv
+write.csv(amr_extremo_categorized_3, "E:/SARA_AFZAL/FINAL_FILES/amr_extremo_categorized_3.csv", row.names = FALSE)
+
+################################################################
+#Count AMR containing isolates
+AMR_containing_isolates <- read.csv("E:/SARA_AFZAL/FINAL_FILES/amr_extremo_categorized_3.csv")
+AMR_containing_isolates_count <- AMR_containing_isolates %>% distinct(Accession_number) %>% count(Accession_number)
+print(AMR_containing_isolates_count)
+write.csv(AMR_containing_isolates_count, "E:/SARA_AFZAL/FINAL_FILES/Final_extremophiles_accessionNo")
+```
+
+
+
+
+```{r}
+#MANUSCRIPT_PARTA_publication count
+library(readr)
+library(dplyr)
+publication_count = Final_amr_info_final %>% count(Final_amr_info_final$Paper.name)
+print(publication_count)
+publication_total <- read.csv("E:/SARA_AFZAL/FINAL_FILES/Final_table_cleaned.csv")
+publication_count_total = publication_total %>% 
+  filter(Paper.name != "" & !is.na(Paper.name)) %>% 
+  distinct(Paper.name) %>%
+count()
+print(publication_count_total)
+extremo_category <- publication_total %>% count(publication_total$Extremophile_Category) %>% arrange(desc(n))
+print(extremo_category)
+write.csv(extremo_category, "E:/SARA_AFZAL/FINAL_FILES/extremo_category_count.csv", row.names = FALSE)
+#MANUSCRIPT PART B.... Count AMR carrying bacterial species
+merged_mlst_info <- read.csv("E:/SARA_AFZAL/FINAL_FILES/info_merged_mlst.csv")
+#bacteria count through species finder
+bacterial_countSF <- merged_mlst_info %>% mutate(BacterialName = na_if(Bacterial.name..Found.of.Species.finder., "")) %>%  # Convert blank to NA
+  count(BacterialName) %>%
+  arrange(desc(n))
+write.csv(bacterial_countSF, "E:/SARA_AFZAL/FINAL_FILES/bacterial_countSF.csv", row.names = FALSE)
+
+#FOR MLST wise
+bacterial_countMLST <- merged_mlst_info %>% mutate(BacterialName = na_if(Species, "")) %>%  # Convert blank to NA
+  count(BacterialName) %>%
+  arrange(desc(n))
+write.csv(bacterial_countMLST, "E:/SARA_AFZAL/FINAL_FILES/bacterial_countMLST.csv", row.names = FALSE)
+
+#FOR AMR CARRYING EXTREMO COUNT
+AMR_containing_isolates <- read.csv("E:/SARA_AFZAL/FINAL_FILES/amr_extremo_categorized_3.csv")
+colnames(AMR_containing_isolates)[24] <- c("Extremophile_Category")
+write.csv(AMR_containing_isolates, "E:/SARA_AFZAL/FINAL_FILES/amr_extremo_categorized_3.csv", row.names = FALSE)
+AMR_extremo_category_count <- AMR_containing_isolates %>%
+  distinct(Extremophile_Category, Accession_number) %>%  # remove duplicate pairs
+  count(Extremophile_Category, name = "Unique_Isolate_Count") %>% arrange(desc(Unique_Isolate_Count))
+write.csv(AMR_extremo_category_count, "E:/SARA_AFZAL/FINAL_FILES/amr_extremo_category_count.csv", row.names = FALSE)
+print(AMR_extremo_category_count)
+
+
+```
+
+```{r}
+#Figures
+library(dplyr)
+library(ggplot2)
+library(viridis)
+#Use pastel.pal of cartography for distinct, soft pastel colors
+#install.packages("cartography")
+library(cartography)
+# Generate a pastel palette with enough colors
+pastel_colors <- carto.pal(pal1 = "pastel.pal", n1 = length(unique(extremo_category_count$Extremophile_Category)))
+
+
+
+#Fig1_ Bar graph of total genomes vs ARG carrying extremophiles
+extremo_genomes <- data.frame(Category = c("Total Genomes", "ARG-Carrying Genomes"), Count = c(398, 77))
+# Set order of bars
+extremo_genomes$Category <- factor(extremo_genomes$Category, levels = c("Total Genomes", "ARG-Carrying Genomes"))
+#plot
+extremo_genomes_plot <- ggplot(extremo_genomes, aes(x = Category, y = Count, fill = Category)) +
+  geom_bar(stat = "identity", width = 0.5, color = "black") +
+  scale_fill_manual(values = c("Total Genomes" = "#4C72B0", "ARG-Carrying Genomes" = "#DD8452")) +
+  labs(y = "Number of Genomes", x = NULL) +
+  theme_minimal(base_size = 14) +
+  theme(
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.text.x = element_text(size = 10, face = "bold", angle = 0),
+    axis.text.y = element_text(size = 10),
+    axis.title.y = element_text(size = 10, face = "bold"),
+    plot.title = element_text(size = 10, face = "bold", hjust = 0.5),
+    legend.position = "none"
+  ) +
+  ggtitle("Total vs ARG-Carrying Extremophiles")
+ggsave("E:/SARA_AFZAL/MANUSCRIPT_IJAA/Figures/1.pdf",
+       plot = extremo_genomes_plot,
+       width = 4, height = 5, units = "in", dpi = 600)
+
+##FIGURE 2_Extremophile Categories.................
+extremo_category_count <- read.csv("E:/SARA_AFZAL/FINAL_FILES/extremo_category_count.csv")
+colnames(extremo_category_count)[1] <- "Extremophile_Category"
+View(extremo_category_count)
+
+extremo_category_count <- extremo_category_count %>%
+   group_by(Extremophile_Category) %>%
+  summarise(n = sum(n), .groups = "drop") %>%
+  arrange(desc(n))
+
+# Get top 10 categories
+top10_extremo <- extremo_category_count %>%
+  group_by(Extremophile_Category) %>%
+  summarise(n = sum(n), .groups = "drop") %>%
+  arrange(desc(n)) %>%
+  slice_head(n = 10) %>%
+  mutate(Extremophile_Category = factor(Extremophile_Category, levels = Extremophile_Category))
+
+
+
+
+#plot
+extremo_category_plot <- ggplot(top10_extremo, aes(x = reorder(Extremophile_Category, n), y = n, fill = Extremophile_Category)) +
+  geom_bar(stat = "identity", width = 0.6, color = "black") +
+  coord_flip() +
+  scale_fill_manual(values = pastel_colors) +  # Automatically handles up to 12 colors
+  labs(y = "No. of isolates", x = NULL) +
+  theme_minimal(base_size = 14) +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 10),
+    axis.title.y = element_text(size = 10, face = "bold"),
+    plot.title = element_text(size = 10, face = "bold", hjust = 0.5),
+    legend.position = "none"
+  ) +
+  ggtitle("Extremophile categories and corresponding isolates")
+
+ggsave("E:/SARA_AFZAL/MANUSCRIPT_IJAA/Figures/2v2.pdf",
+       plot = extremo_category_plot,
+       width = 10, height = 5, units = "in", dpi = 600)
+
+##LOLLIPOP PLOT
+#ggplot(extremo_category_count, aes(x = reorder(Extremophile_Category, n), y = n)) +
+  geom_segment(aes(xend = Extremophile_Category, yend = 0), color = "gray") +
+  geom_point(size = 4, color = "#4C72B0") +
+  coord_flip() +
+  labs(y = "No. of isolates", x = NULL) +
+  theme_minimal(base_size = 14) +
+  theme(
+    panel.grid.major.y = element_blank(),
+    axis.text = element_text(size = 10),
+    axis.title.y = element_text(size = 10, face = "bold"),
+    plot.title = element_text(size = 10, face = "bold", hjust = 0.5)
+  ) +
+  ggtitle("Extremophile categories and corresponding isolates")
+  
+####################*************************################
+#Figure 2 B, extremophile category of AMR carrying isolates
+# Read your CSV file
+AMRextremo_category_counts <- read.csv("E:/SARA_AFZAL/FINAL_FILES/amr_extremo_category_count.csv")
+head(AMRextremo_category_counts)
+# Get top 5 categories by frequency (assuming column names: Extremophile_Category and n)
+top5AMRextremo_category_counts <- AMRextremo_category_counts %>%
+  arrange(desc(n)) %>%
+  slice_head(n = 5) %>%
+  mutate(Extremophile_Category = factor(Extremophile_Category, levels = Extremophile_Category))
+
+
+#plot
+amr_extremo_category_plot <- ggplot(top5AMRextremo_category_counts, aes(x = reorder(Extremophile_Category, Unique_Isolate_Count), y = Unique_Isolate_Count, fill = Extremophile_Category)) +
+  geom_bar(stat = "identity", width = 0.6, color = "black") +
+  coord_flip() +
+  scale_fill_manual(values = pastel_colors) +  # Automatically handles up to 12 colors
+  labs(y = "No. of isolates", x = NULL) +
+  theme_minimal(base_size = 14) +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 10),
+    axis.title.y = element_text(size = 10, face = "bold"),
+    plot.title = element_text(size = 10, face = "bold", hjust = 0.5),
+    legend.position = "none"
+  ) +
+  ggtitle("Extremophile categories and corresponding isolates")
+
+ggsave("E:/SARA_AFZAL/MANUSCRIPT_IJAA/Figures/2b.pdf",
+       plot = amr_extremo_category_plot,
+       width = 10, height = 5, units = "in", dpi = 600)
+
+###Figure 3a_ all ARGs
+#by name
+amr_data <- read.csv("E:/SARA_AFZAL/FINAL_FILES/AMR_finder_count.csv")
+
+# Get top 10 and reorder for high to low from left to right
+top10_amr <- amr_data %>%
+  arrange(desc(n)) %>%
+  slice_head(n = 10) %>%
+  mutate(Element.symbol = factor(Element.symbol, levels = Element.symbol))
+
+# Plot
+top10ARG_plot <- ggplot(top10_amr, aes(x = Element.symbol, y = n, fill = Element.symbol)) +
+  geom_bar(stat = "identity", color = "black", width = 0.6) +
+  scale_fill_manual(values = pastel_colors) +
+  labs(x = "AMR Gene", y = "Count", title = "Top 10 AMR Elements") +
+  theme_minimal(base_size = 14) +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(angle = 0, hjust = 1, size = 10),
+    plot.title = element_text(hjust = 0.5, face = "bold")
+  )
+ggsave("E:/SARA_AFZAL/MANUSCRIPT_IJAA/Figures/3a.pdf",
+       plot = top10ARG_plot,
+       width = 10, height = 5, units = "in", dpi = 600)
+####Figure 3b_ drug class
+amr_drug_class <- read.csv("E:/SARA_AFZAL/FINAL_FILES/AMR_finder_classcount.csv")
+
+# Get top 10 and reorder for high to low from left to right
+top10_amr_drug_class <- amr_drug_class %>%
+  arrange(desc(n)) %>%
+  slice_head(n = 10) %>%
+  mutate(Class = factor(Class, levels = Class))
+
+# Plot
+top10amr_drug_class_plot <- ggplot(top10_amr_drug_class, aes(x = Class, y = n, fill = Class)) +
+  geom_bar(stat = "identity", color = "black", width = 0.6) +
+  scale_fill_manual(values = pastel_colors) +
+  labs(x = "AMR Drug Class", y = "Count", title = "Top 10 resistant drug classes") +
+  theme_minimal(base_size = 14) +
+  theme(
+    legend.position = "none",
+    axis.text.x = element_text(angle = 0, hjust = 1, size = 6),
+    plot.title = element_text(hjust = 0.5, face = "bold")
+  )
+ggsave("E:/SARA_AFZAL/MANUSCRIPT_IJAA/Figures/3b.pdf",
+       plot = top10amr_drug_class_plot,
+       width = 10, height = 5, units = "in", dpi = 600)
+
+```
+
+
+
+
+
+
+
