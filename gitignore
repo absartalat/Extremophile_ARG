@@ -1,0 +1,41 @@
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
+.Renviron
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Build/cache
+*_cache/
+cache/
+.Rcheck/
+
+# Results and data (keep repo lightweight)
+results/
+data/*
+!data/README.md
+
+# Rendered / export artifacts
+*.html
+*.pdf
+*.docx
+*.xlsx
+*.csv
+*.tsv
+*.rds
+*.rda
+*.bak
+*.tmp
+*.log
+
+# Python (if used)
+__pycache__/
+*.pyc
+
+# renv / packrat libraries (lockfile is ok)
+renv/library/
+renv/staging/
+packrat/
