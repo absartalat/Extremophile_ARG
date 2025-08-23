@@ -1,0 +1,2 @@
+Protein id	Contig id	Start	Stop	Strand	Element symbol	Element name	Scope	Type	Subtype	Class	Subclass	Method	Target length	Reference sequence length	% Coverage of reference	% Identity to reference	Alignment length	Closest reference accession	Closest reference name	HMM accession	HMM description
+NA	JAHXHC010000006.1	57275	58162	-	mphN	macrolide 2'-phosphotransferase MphN	core	AMR	AMR	MACROLIDE	ERYTHROMYCIN	BLASTX	296	296	100.00	98.99	296	WP_024127776.1	macrolide 2'-phosphotransferase MphN	NA	NA

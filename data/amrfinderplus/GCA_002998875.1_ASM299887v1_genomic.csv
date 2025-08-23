@@ -1,0 +1,17 @@
+Protein id	Contig id	Start	Stop	Strand	Element symbol	Element name	Scope	Type	Subtype	Class	Subclass	Method	Target length	Reference sequence length	% Coverage of reference	% Identity to reference	Alignment length	Closest reference accession	Closest reference name	HMM accession	HMM description
+NA	PVRN01000001.1	404495	406879	+	inhA1	M6 family metalloprotease immune inhibitor InhA1	plus	VIRULENCE	VIRULENCE	NA	NA	BLASTX	795	796	100.00	96.61	796	ADH05944.1	M6 family metalloprotease immune inhibitor InhA1	NA	NA
+NA	PVRN01000002.1	31565	32689	-	hblB	hemolytic enterotoxin HBL binding subunit HblB	plus	VIRULENCE	VIRULENCE	NA	NA	BLASTX	375	375	100.00	92.27	375	AAP10046.1	hemolytic enterotoxin HBL binding subunit HblB	NA	NA
+NA	PVRN01000002.1	32729	33946	-	hblD	hemolytic enterotoxin HBL lytic component L1	plus	VIRULENCE	VIRULENCE	NA	NA	BLASTX	406	406	100.00	99.26	406	AAP10047.1	hemolytic enterotoxin HBL lytic component L1	NA	NA
+NA	PVRN01000002.1	34011	35327	-	hblC	hemolytic enterotoxin HBL lytic component L2	plus	VIRULENCE	VIRULENCE	NA	NA	BLASTX	439	439	100.00	94.31	439	AAP10048.1	hemolytic enterotoxin HBL lytic component L2	NA	NA
+NA	PVRN01000002.1	414548	415798	-	entFM	enterotoxin EntFM	plus	VIRULENCE	VIRULENCE	NA	NA	BLASTX	417	436	100.00	92.20	436	AJH19624.1	enterotoxin EntFM	NA	NA
+NA	PVRN01000002.1	509048	510124	-	nheC	non-hemolytic enterotoxin NHE subunit C	plus	VIRULENCE	VIRULENCE	NA	NA	BLASTX	359	359	100.00	94.43	359	AAP08785.1	non-hemolytic enterotoxin NHE subunit C	NA	NA
+NA	PVRN01000002.1	510262	511467	-	nheB	non-hemolytic enterotoxin NHE subunit B	plus	VIRULENCE	VIRULENCE	NA	NA	BLASTX	402	402	100.00	99.50	402	AAS40893.1	non-hemolytic enterotoxin NHE subunit B	NA	NA
+NA	PVRN01000002.1	511502	512659	-	nheA	non-hemolytic enterotoxin NHE subunit A	plus	VIRULENCE	VIRULENCE	NA	NA	BLASTX	386	386	100.00	97.41	386	AAS40892.1	non-hemolytic enterotoxin NHE subunit A	NA	NA
+NA	PVRN01000003.1	493986	494534	+	satA	streptothricin N-acetyltransferase SatA	core	AMR	AMR	STREPTOTHRICIN	STREPTOTHRICIN	BLASTX	183	184	99.46	92.90	183	WP_000054744.1	streptothricin N-acetyltransferase SatA	NA	NA
+NA	PVRN01000005.1	278182	278952	+	bla2	BcII family subclass B1 metallo-beta-lactamase	core	AMR	AMR	BETA-LACTAM	CARBAPENEM	BLASTX	257	257	100.00	92.61	257	WP_012261328.1	BcII family subclass B1 metallo-beta-lactamase	NA	NA
+NA	PVRN01000008.1	47501	48514	-	sph	sphingomyelinase C	plus	VIRULENCE	VIRULENCE	NA	NA	INTERNAL_STOP	338	338	100.00	93.79	338	AAP24691.1	sphingomyelinase C	NA	NA
+NA	PVRN01000008.1	48576	49424	-	cerA	phospholipase CerA	plus	VIRULENCE	VIRULENCE	NA	NA	BLASTX	283	283	100.00	93.99	283	AAS39677.1	phospholipase CerA	NA	NA
+NA	PVRN01000008.1	53616	56012	-	inhA2	M6 family metalloprotease immune inhibitor InhA2	plus	VIRULENCE	VIRULENCE	NA	NA	BLASTX	799	799	100.00	96.62	799	AAP07680.1	M6 family metalloprotease immune inhibitor InhA2	NA	NA
+NA	PVRN01000013.1	9445	10362	+	bla	class A beta-lactamase Bla1	core	AMR	AMR	BETA-LACTAM	BETA-LACTAM	BLASTX	306	306	100.00	94.77	306	WP_063842248.1	class A beta-lactamase Bla1	NA	NA
+NA	PVRN01000019.1	85436	86599	-	vanS-Pt	vancomycin resistance histidine kinase VanS-Pt	core	AMR	AMR	GLYCOPEPTIDE	VANCOMYCIN	BLASTX	388	386	100.00	91.24	388	WP_063856741.1	vancomycin resistance histidine kinase VanS-Pt	NA	NA
+NA	PVRN01000019.1	86583	87272	-	vanR-A	vancomycin resistance response regulator transcription factor VanR-A	core	AMR	AMR	GLYCOPEPTIDE	VANCOMYCIN	BLASTX	230	231	99.57	93.48	230	WP_063856721.1	vancomycin resistance response regulator transcription factor VanR-A	NA	NA

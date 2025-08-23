@@ -1,0 +1,19 @@
+Protein id	Contig id	Start	Stop	Strand	Element symbol	Element name	Scope	Type	Subtype	Class	Subclass	Method	Target length	Reference sequence length	% Coverage of reference	% Identity to reference	Alignment length	Closest reference accession	Closest reference name	HMM accession	HMM description
+NA	PVRU01000002.1	455847	457004	+	nheA	non-hemolytic enterotoxin NHE subunit A	plus	VIRULENCE	VIRULENCE	NA	NA	BLASTX	386	386	100.00	97.93	386	AAS40892.1	non-hemolytic enterotoxin NHE subunit A	NA	NA
+NA	PVRU01000002.1	457039	458244	+	nheB	non-hemolytic enterotoxin NHE subunit B	plus	VIRULENCE	VIRULENCE	NA	NA	BLASTX	402	402	100.00	98.76	402	AAS40893.1	non-hemolytic enterotoxin NHE subunit B	NA	NA
+NA	PVRU01000002.1	458355	459431	+	nheC	non-hemolytic enterotoxin NHE subunit C	plus	VIRULENCE	VIRULENCE	NA	NA	BLASTX	359	359	100.00	95.82	359	AAS40894.1	non-hemolytic enterotoxin NHE subunit C	NA	NA
+NA	PVRU01000002.1	545774	547051	+	entFM	enterotoxin EntFM	plus	VIRULENCE	VIRULENCE	NA	NA	BLASTX	426	430	100.00	97.21	430	AAP08924.1	enterotoxin EntFM	NA	NA
+NA	PVRU01000002.1	618752	619165	+	fosB	FosBx1 family fosfomycin resistance bacillithiol transferase	core	AMR	AMR	FOSFOMYCIN	FOSFOMYCIN	BLASTX	138	138	100.00	93.48	138	WP_000943763.1	fosfomycin resistance bacillithiol transferase FosBx1	NA	NA
+NA	PVRU01000003.1	52688	53452	+	bla2	BcII family subclass B1 metallo-beta-lactamase	core	AMR	AMR	BETA-LACTAM	CARBAPENEM	BLASTX	255	257	99.22	94.12	255	WP_012261328.1	BcII family subclass B1 metallo-beta-lactamase	NA	NA
+NA	PVRU01000003.1	151535	153070	+	alo	anthrolysin O/cereolysin O family cholesterol-dependent cytolysin Alo	plus	VIRULENCE	VIRULENCE	NA	NA	BLASTX	512	512	100.00	97.46	512	QKI25716.1	anthrolysin O/cereolysin O family cholesterol-dependent cytolysin Alo	NA	NA
+NA	PVRU01000003.1	189361	190677	+	hblC	hemolytic enterotoxin HBL lytic component L2	plus	VIRULENCE	VIRULENCE	NA	NA	BLASTX	439	439	100.00	94.99	439	AAP10048.1	hemolytic enterotoxin HBL lytic component L2	NA	NA
+NA	PVRU01000003.1	190744	191961	+	hblD	hemolytic enterotoxin HBL lytic component L1	plus	VIRULENCE	VIRULENCE	NA	NA	BLASTX	406	406	100.00	99.01	406	AAP10047.1	hemolytic enterotoxin HBL lytic component L1	NA	NA
+NA	PVRU01000003.1	192001	193125	+	hblB	hemolytic enterotoxin HBL binding subunit HblB	plus	VIRULENCE	VIRULENCE	NA	NA	BLASTX	375	375	100.00	98.13	375	AAP10046.1	hemolytic enterotoxin HBL binding subunit HblB	NA	NA
+NA	PVRU01000004.1	170280	171806	-	alo	anthrolysin O/cereolysin O family cholesterol-dependent cytolysin Alo	plus	VIRULENCE	VIRULENCE	NA	NA	BLASTX	509	509	100.00	97.84	509	AAX88798.1	anthrolysin O/cereolysin O family cholesterol-dependent cytolysin Alo	NA	NA
+NA	PVRU01000005.1	514598	516982	+	inhA1	M6 family metalloprotease immune inhibitor InhA1	plus	VIRULENCE	VIRULENCE	NA	NA	BLASTX	795	796	100.00	94.10	796	ADH05944.1	M6 family metalloprotease immune inhibitor InhA1	NA	NA
+NA	PVRU01000006.1	307692	308606	+	bla	class A beta-lactamase Bla1	core	AMR	AMR	BETA-LACTAM	BETA-LACTAM	BLASTX	305	306	99.67	91.48	305	WP_063842248.1	class A beta-lactamase Bla1	NA	NA
+NA	PVRU01000008.1	194323	195558	+	hlyII	hemolysin II HlyII	plus	VIRULENCE	VIRULENCE	NA	NA	BLASTX	412	412	100.00	96.12	412	AAP10457.1	hemolysin II HlyII	NA	NA
+NA	PVRU01000008.1	195961	196560	+	hlyIIR	hemolysin II regulator HlyIIR	plus	VIRULENCE	VIRULENCE	NA	NA	BLASTX	200	201	99.50	97.50	200	AAO74585.1	hemolysin II regulator HlyIIR	NA	NA
+NA	PVRU01000009.1	145945	148341	+	inhA2	M6 family metalloprotease immune inhibitor InhA2	plus	VIRULENCE	VIRULENCE	NA	NA	BLASTX	799	799	100.00	97.87	799	AAP24685.1	M6 family metalloprotease immune inhibitor InhA2	NA	NA
+NA	PVRU01000009.1	151811	152659	+	cerA	phospholipase CerA	plus	VIRULENCE	VIRULENCE	NA	NA	BLASTX	283	283	100.00	98.94	283	AAS39677.1	phospholipase CerA	NA	NA
+NA	PVRU01000009.1	152721	153734	+	sph	sphingomyelinase C	plus	VIRULENCE	VIRULENCE	NA	NA	INTERNAL_STOP	338	338	100.00	97.93	338	AAP24691.1	sphingomyelinase C	NA	NA

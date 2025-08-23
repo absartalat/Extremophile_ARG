@@ -1,0 +1,20 @@
+Protein id	Contig id	Start	Stop	Strand	Element symbol	Element name	Scope	Type	Subtype	Class	Subclass	Method	Target length	Reference sequence length	% Coverage of reference	% Identity to reference	Alignment length	Closest reference accession	Closest reference name	HMM accession	HMM description
+NA	CP067375.1	504149	506545	+	inhA2	M6 family metalloprotease immune inhibitor InhA2	plus	VIRULENCE	VIRULENCE	NA	NA	BLASTX	799	799	100.00	98.87	799	AAP07680.1	M6 family metalloprotease immune inhibitor InhA2	NA	NA
+NA	CP067375.1	510726	511574	+	cerA	phospholipase CerA	plus	VIRULENCE	VIRULENCE	NA	NA	BLASTX	283	283	100.00	94.70	283	AAS39677.1	phospholipase CerA	NA	NA
+NA	CP067375.1	511639	512652	+	sph	sphingomyelinase C	plus	VIRULENCE	VIRULENCE	NA	NA	INTERNAL_STOP	338	338	100.00	98.22	338	CAF33353.1	sphingomyelinase C	NA	NA
+NA	CP067375.1	962604	963611	-	cytK2	beta-channel forming cytolysin CytK2	plus	VIRULENCE	VIRULENCE	NA	NA	BLASTX	336	336	100.00	98.21	336	AAP08097.1	beta-channel forming cytolysin CytK2	NA	NA
+NA	CP067375.1	1113333	1115720	+	inhA1	M6 family metalloprotease immune inhibitor InhA1	plus	VIRULENCE	VIRULENCE	NA	NA	BLASTX	796	796	100.00	96.98	796	ADH05944.1	M6 family metalloprotease immune inhibitor InhA1	NA	NA
+NA	CP067375.1	1612773	1613930	+	nheA	non-hemolytic enterotoxin NHE subunit A	plus	VIRULENCE	VIRULENCE	NA	NA	BLASTX	386	386	100.00	96.63	386	AAS40892.1	non-hemolytic enterotoxin NHE subunit A	NA	NA
+NA	CP067375.1	1613971	1615176	+	nheB	non-hemolytic enterotoxin NHE subunit B	plus	VIRULENCE	VIRULENCE	NA	NA	BLASTX	402	402	100.00	98.76	402	AAS40893.1	non-hemolytic enterotoxin NHE subunit B	NA	NA
+NA	CP067375.1	1615287	1616363	+	nheC	non-hemolytic enterotoxin NHE subunit C	plus	VIRULENCE	VIRULENCE	NA	NA	BLASTX	359	359	100.00	98.89	359	AAP08785.1	non-hemolytic enterotoxin NHE subunit C	NA	NA
+NA	CP067375.1	1679536	1680774	+	entFM	enterotoxin EntFM	plus	VIRULENCE	VIRULENCE	NA	NA	BLASTX	413	430	100.00	93.95	430	AAP08924.1	enterotoxin EntFM	NA	NA
+NA	CP067375.1	1749924	1750337	+	fosB	FosBx1 family fosfomycin resistance bacillithiol transferase	core	AMR	AMR	FOSFOMYCIN	FOSFOMYCIN	BLASTX	138	138	100.00	98.55	138	WP_000943763.1	fosfomycin resistance bacillithiol transferase FosBx1	NA	NA
+NA	CP067375.1	2314758	2315675	+	bla	class A beta-lactamase Bla1	core	AMR	AMR	BETA-LACTAM	BETA-LACTAM	BLASTX	306	306	100.00	99.35	306	WP_063842248.1	class A beta-lactamase Bla1	NA	NA
+NA	CP067375.1	2896792	2898189	-	hblA	hemolytic enterotoxin HBL binding subunit HblA	plus	VIRULENCE	VIRULENCE	NA	NA	BLASTX	466	466	100.00	99.14	466	CAB64770.1	hemolytic enterotoxin HBL binding subunit HblA	NA	NA
+NA	CP067375.1	2898568	2899692	-	hblB	hemolytic enterotoxin HBL binding subunit HblB	plus	VIRULENCE	VIRULENCE	NA	NA	BLASTX	375	375	100.00	98.67	375	AAP10046.1	hemolytic enterotoxin HBL binding subunit HblB	NA	NA
+NA	CP067375.1	2899732	2900949	-	hblD	hemolytic enterotoxin HBL lytic component L1	plus	VIRULENCE	VIRULENCE	NA	NA	BLASTX	406	406	100.00	99.75	406	AAP10047.1	hemolytic enterotoxin HBL lytic component L1	NA	NA
+NA	CP067375.1	2901014	2902330	-	hblC	hemolytic enterotoxin HBL lytic component L2	plus	VIRULENCE	VIRULENCE	NA	NA	BLASTX	439	439	100.00	96.36	439	AAP10048.1	hemolytic enterotoxin HBL lytic component L2	NA	NA
+NA	CP067375.1	3243700	3244470	-	bla2	BcII family subclass B1 metallo-beta-lactamase	core	AMR	AMR	BETA-LACTAM	CARBAPENEM	BLASTX	257	257	100.00	93.00	257	WP_063839879.1	BcII family subclass B1 metallo-beta-lactamase	NA	NA
+NA	CP067375.1	3632760	3633746	-	plcA	phosphatidylinositol diacylglycerol-lyase	plus	VIRULENCE	VIRULENCE	NA	NA	BLASTX	329	329	100.00	98.48	329	AAP10686.1	phosphatidylinositol diacylglycerol-lyase	NA	NA
+NA	CP067375.1	4892270	4893796	-	alo	anthrolysin O/cereolysin O family cholesterol-dependent cytolysin Alo	plus	VIRULENCE	VIRULENCE	NA	NA	BLASTX	509	509	100.00	99.80	509	AAX88798.1	anthrolysin O/cereolysin O family cholesterol-dependent cytolysin Alo	NA	NA
+NA	CP067375.1	5063308	5064174	-	bpsC	UTP--glucose-1-phosphate uridylyltransferase BpsC	plus	VIRULENCE	VIRULENCE	NA	NA	BLASTX	289	295	97.97	89.62	289	AJI07989.1	UTP--glucose-1-phosphate uridylyltransferase BpsC	NA	NA
