@@ -1,4 +1,7 @@
-# Extremophile_ARG <img src="C:\Users\absar\Pictures\WGS_Img01_900.jpg" alt="Project Logo" width="80" align="right" />
+# Extremophile_ARG <img src="logo.png" alt="Project Logo" width="80" align="right" />
+=======
+# Extremophile_ARG <img src="logo.png" alt="Project Logo" width="80" align="right" />
+
 
 [![Code License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Content License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)](LICENSE-CC-BY.md)
@@ -23,6 +26,7 @@ Extremophile_ARG/
 ├── results/
 │   ├── tables/        # Final tables (generated)
 │   └── figures/       # Final plots (generated)
+├── images/            # Logos, figures, other visuals
 ├── README.md
 ├── LICENSE            # MIT (code)
 └── LICENSE-CC-BY.md   # CC BY 4.0 (text/figures)
