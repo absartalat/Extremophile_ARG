@@ -1,6 +1,4 @@
-# Extremophile_ARG <img src="logo.png" alt="Project Logo" width="80" align="right" />
-=======
-# Extremophile_ARG <img src="logo.png" alt="Project Logo" width="80" align="right" />
+# Extremophile_ARG <img src="images/Logo.png" alt="Project Logo" width="80" align="right" />
 
 
 [![Code License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
